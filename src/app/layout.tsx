@@ -1,18 +1,14 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+export const metadata = {
+  title: 'PT. ANDIKA PRATAMA',
+  description: 'Solusi Kerja Premium',
+}
 
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "PT. ANDIKA PRATAMA",
-  description: "Solusi Kerja Premium",
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }) {
   return (
     <html lang="id">
-      <body className={inter.className}>{children}</body>
+      <body style={{ margin: 0, fontFamily: 'Arial, sans-serif' }}>
+        {children}
+      </body>
     </html>
-  );
+  )
 }
