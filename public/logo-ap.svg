@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="800" height="600"
+     viewBox="0 0 800 600">
+
+  <defs>
+    <style>
+      .main {
+        fill: none;
+        stroke: #111111;
+        stroke-width: 48;
+        stroke-linecap: square;
+        stroke-linejoin: miter;
+      }
+      .accent {
+        fill: none;
+        stroke: #c80000;
+        stroke-width: 48;
+        stroke-linecap: square;
+      }
+    </style>
+  </defs>
+
+  <!-- Huruf A -->
+  <path class="main"
+    d="M300 440
+       L400 160
+       L500 440"/>
+
+  <!-- Palang A -->
+  <line x1="345" y1="320" x2="455" y2="320" class="main"/>
+
+  <!-- Huruf P (menyatu) -->
+  <path class="main"
+    d="M500 160
+       L500 440"/>
+
+  <path class="main"
+    d="M500 160
+       C640 160, 640 300, 500 300"/>
+
+  <!-- Aksen profesional (subtle) -->
+  <line x1="400" y1="160" x2="400" y2="210" class="accent"/>
+
+</svg>
