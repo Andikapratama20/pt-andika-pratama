@@ -94,8 +94,58 @@ export default function HomePage() {
   const handleTestimoniImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Validasi ukuran file (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setToast({ message: "Ukuran gambar maksimal 10MB!", type: "error" });
+        return;
+      }
+
+      // Kompresi gambar sebelum upload
+      const img = new window.Image();
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      
       const reader = new FileReader();
-      reader.onloadend = () => setUploadImage(reader.result as string);
+      reader.onload = (event) => {
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          try {
+            // Max width/height 800px
+            const maxSize = 800;
+            let width = img.width;
+            let height = img.height;
+            
+            if (width > height) {
+              if (width > maxSize) {
+                height = (height * maxSize) / width;
+                width = maxSize;
+              }
+            } else {
+              if (height > maxSize) {
+                width = (width * maxSize) / height;
+                height = maxSize;
+              }
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            ctx?.drawImage(img, 0, 0, width, height);
+            
+            // Quality 0.7 (70%)
+            const compressedData = canvas.toDataURL("image/jpeg", 0.7);
+            setUploadImage(compressedData);
+            setToast({ message: "Gambar siap diupload!", type: "success" });
+          } catch {
+            setToast({ message: "Gagal memproses gambar!", type: "error" });
+          }
+        };
+        img.onerror = () => {
+          setToast({ message: "Gagal memuat gambar!", type: "error" });
+        };
+      };
+      reader.onerror = () => {
+        setToast({ message: "Gagal membaca file!", type: "error" });
+      };
       reader.readAsDataURL(file);
     }
   };
@@ -133,6 +183,7 @@ export default function HomePage() {
         setToast({ message: "Testimoni berhasil diupload!", type: "success" });
         setUploadImage(null);
         setUploadKeterangan("");
+        // Reload testimoni
         const res2 = await fetch("/api/testimoni");
         const data2 = await res2.json();
         if (data2.success) {
@@ -489,7 +540,6 @@ export default function HomePage() {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            {/* Setengah */}
             <div style={{ backgroundColor: "white", borderRadius: 12, padding: 20, boxShadow: "0 4px 12px rgba(0,0,0,0.1)", border: "1px solid #e5e7eb" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
                 <div style={{ width: 48, height: 48, background: "linear-gradient(135deg, #003366 0%, #001a33 100%)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -511,16 +561,13 @@ export default function HomePage() {
                     <svg width="14" height="14" fill="#003366" viewBox="0 0 16 16"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></svg>
                     {pkg.durasi}
                   </span>
-                  <span style={{ color: "#003366", fontWeight: "bold", fontSize: 13, display: "flex", alignItems: "center", gap: 4 }}>💰 {pkg.gaji}</span>
+                  <span style={{ color: "#003366", fontWeight: "bold", fontSize: 13 }}>💰 {pkg.gaji}</span>
                 </div>
               ))}
             </div>
 
-            {/* Full */}
             <div style={{ backgroundColor: "white", borderRadius: 12, padding: 20, boxShadow: "0 4px 12px rgba(0,0,0,0.1)", border: "2px solid #FFD700", position: "relative" }}>
-              <span style={{ position: "absolute", top: 12, right: 12, backgroundColor: "#FFD700", color: "#003366", padding: "4px 10px", borderRadius: 4, fontSize: 11, fontWeight: "bold", display: "flex", alignItems: "center", gap: 4 }}>
-                ⭐ Recommended
-              </span>
+              <span style={{ position: "absolute", top: 12, right: 12, backgroundColor: "#FFD700", color: "#003366", padding: "4px 10px", borderRadius: 4, fontSize: 11, fontWeight: "bold", display: "flex", alignItems: "center", gap: 4 }}>⭐ Recommended</span>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
                 <div style={{ width: 48, height: 48, background: "linear-gradient(135deg, #FFD700 0%, #E6C200 100%)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <svg width="24" height="24" fill="#003366" viewBox="0 0 16 16"><path d="M8 0c-.176 0-.35.006-.523.017l.064.998a7.117 7.117 0 0 1 .918 0l.064-.998A8.113 8.113 0 0 0 8 0zM6.61 1.121l-.224-.975a8.067 8.067 0 0 0-1.027.297l.364.931c.28-.11.579-.193.887-.253zM4.58 1.987l-.487-.873a8.074 8.074 0 0 0-.91.51l.56.83a7.11 7.11 0 0 1 .837-.467zM2.96 3.314l-.758-.652a8.09 8.09 0 0 0-.72.758l.814.58c.189-.249.41-.482.665-.686zM1.606 4.874l-.938-.348a8.05 8.05 0 0 0-.433.983l.945.33c.114-.334.258-.657.426-.965zm-.887 1.835L0 6.616v1l.719-.093a7.129 7.129 0 0 1 0-.814zM0 8.384v1l.719.093a7.129 7.129 0 0 1 0-.814L0 8.384zm.334 1.874-.945.33c.105.339.248.665.425.982l.938-.348a6.808 6.808 0 0 1-.418-.964zm.9 1.69-.814.58c.22.28.458.547.72.758l.757-.653a6.126 6.126 0 0 1-.663-.685zm1.37 1.31-.56.83c.29.196.596.367.91.51l.487-.873a6.107 6.107 0 0 1-.837-.468zm1.653.87-.364.93c.333.12.677.218 1.027.297l.224-.975a6.163 6.163 0 0 1-.887-.253zm1.829.4-.064.998c.173.011.347.017.523.017.176 0 .35-.006.523-.017l-.064-.998a7.117 7.117 0 0 1-.918 0zm1.814-.4.224.975c.35-.08.693-.177 1.027-.297l-.364-.93a6.163 6.163 0 0 1-.887.253zm1.706-.77.487.873c.314-.143.62-.314.91-.51l-.56-.83a6.107 6.107 0 0 1-.837.468zm1.45-1.148.757.653c.262-.211.5-.478.72-.758l-.814-.58a6.126 6.126 0 0 1-.663.685zm1.11-1.582.938.348c.177-.317.32-.643.425-.982l-.945-.33a6.808 6.808 0 0 1-.418.964zm.71-1.9.719.093v-1l-.719.093a7.129 7.129 0 0 1 0 .814z"/></svg>
@@ -541,7 +588,7 @@ export default function HomePage() {
                     <svg width="14" height="14" fill="#003366" viewBox="0 0 16 16"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></svg>
                     {pkg.durasi}
                   </span>
-                  <span style={{ color: "#003366", fontWeight: "bold", fontSize: 13, display: "flex", alignItems: "center", gap: 4 }}>💰 {pkg.gaji}</span>
+                  <span style={{ color: "#003366", fontWeight: "bold", fontSize: 13 }}>💰 {pkg.gaji}</span>
                 </div>
               ))}
             </div>
@@ -602,9 +649,7 @@ export default function HomePage() {
             <p style={{ color: "#666", fontSize: "clamp(0.875rem, 2.5vw, 1rem)" }}>Testimoni nyata dan statistik pekerja kami</p>
           </div>
 
-          {/* Data Grafik */}
           <div style={{ display: "flex", flexDirection: "column", gap: 24, marginBottom: 40 }}>
-            {/* Status Pekerja Chart */}
             <div style={{ backgroundColor: "white", borderRadius: 12, padding: 24, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
               <h3 style={{ color: "#003366", fontWeight: "bold", marginBottom: 20, fontSize: 16, textAlign: "center" }}>📊 Status Pekerja</h3>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -627,7 +672,6 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Daerah Chart */}
             <div style={{ backgroundColor: "white", borderRadius: 12, padding: 24, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
               <h3 style={{ color: "#003366", fontWeight: "bold", marginBottom: 20, fontSize: 16, textAlign: "center" }}>📍 Daerah Asal Pekerja</h3>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -651,7 +695,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Testimoni Gajian */}
           <div style={{ marginBottom: 32 }}>
             <h3 style={{ color: "#003366", fontWeight: "bold", marginBottom: 16, fontSize: 18, textAlign: "center" }}>💰 Testimoni Gajian</h3>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
@@ -662,12 +705,7 @@ export default function HomePage() {
                     <div style={{ padding: 8, backgroundColor: "rgba(0,51,102,0.9)", color: "white", fontSize: 12 }}>{item.keterangan}</div>
                   )}
                   {isAdminLoggedIn && (
-                    <button 
-                      onClick={() => handleDeleteTestimoni(item.id)}
-                      style={{ position: "absolute", top: 8, right: 8, backgroundColor: "#EF4444", color: "white", border: "none", borderRadius: 4, padding: "4px 8px", fontSize: 12, cursor: "pointer" }}
-                    >
-                      🗑️ Hapus
-                    </button>
+                    <button onClick={() => handleDeleteTestimoni(item.id)} style={{ position: "absolute", top: 8, right: 8, backgroundColor: "#EF4444", color: "white", border: "none", borderRadius: 4, padding: "4px 8px", fontSize: 12, cursor: "pointer" }}>🗑️ Hapus</button>
                   )}
                 </div>
               )) : (
@@ -676,7 +714,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Bukti Legal/Resmi */}
           <div>
             <h3 style={{ color: "#003366", fontWeight: "bold", marginBottom: 16, fontSize: 18, textAlign: "center" }}>✅ Bukti Legal/Resmi</h3>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
@@ -687,12 +724,7 @@ export default function HomePage() {
                     <div style={{ padding: 8, backgroundColor: "rgba(16,185,129,0.9)", color: "white", fontSize: 12 }}>{item.keterangan}</div>
                   )}
                   {isAdminLoggedIn && (
-                    <button 
-                      onClick={() => handleDeleteTestimoni(item.id)}
-                      style={{ position: "absolute", top: 8, right: 8, backgroundColor: "#EF4444", color: "white", border: "none", borderRadius: 4, padding: "4px 8px", fontSize: 12, cursor: "pointer" }}
-                    >
-                      🗑️ Hapus
-                    </button>
+                    <button onClick={() => handleDeleteTestimoni(item.id)} style={{ position: "absolute", top: 8, right: 8, backgroundColor: "#EF4444", color: "white", border: "none", borderRadius: 4, padding: "4px 8px", fontSize: 12, cursor: "pointer" }}>🗑️ Hapus</button>
                   )}
                 </div>
               )) : (
@@ -701,46 +733,15 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Hidden Admin Access */}
           <div style={{ textAlign: "center", marginTop: 16 }}>
-            <button 
-              onClick={() => setShowAdminModal(true)}
-              style={{ 
-                backgroundColor: "transparent", 
-                color: "#D1D5DB", 
-                padding: "4px 8px", 
-                border: "none", 
-                borderRadius: 4, 
-                fontSize: 10, 
-                cursor: "pointer",
-                opacity: 0.4,
-                transition: "opacity 0.3s"
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = "1"}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = "0.4"}
-              title="Admin Access"
-            >
-              🔒
-            </button>
+            <button onClick={() => setShowAdminModal(true)} style={{ backgroundColor: "transparent", color: "#D1D5DB", padding: "4px 8px", border: "none", borderRadius: 4, fontSize: 10, cursor: "pointer", opacity: 0.4, transition: "opacity 0.3s" }} onMouseEnter={(e) => e.currentTarget.style.opacity = "1"} onMouseLeave={(e) => e.currentTarget.style.opacity = "0.4"} title="Admin Access">🔒</button>
           </div>
         </div>
       </section>
 
       {/* Admin Modal */}
       {showAdminModal && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0,0,0,0.5)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 9998,
-          padding: 16,
-        }}>
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9998, padding: 16 }}>
           <div style={{ backgroundColor: "white", borderRadius: 12, maxWidth: 500, width: "100%", maxHeight: "90vh", overflow: "auto", position: "relative" }}>
             <button onClick={() => { setShowAdminModal(false); setIsAdminLoggedIn(false); setAdminPassword(""); }} style={{ position: "absolute", top: 16, right: 16, background: "#f3f4f6", border: "none", borderRadius: "50%", width: 32, height: 32, cursor: "pointer", fontSize: 18 }}>✕</button>
             
@@ -750,19 +751,8 @@ export default function HomePage() {
               {!isAdminLoggedIn ? (
                 <div>
                   <label style={{ display: "block", marginBottom: 8, fontWeight: 500, color: "#003366", fontSize: 14 }}>🔑 Password Admin</label>
-                  <input 
-                    type="password" 
-                    value={adminPassword} 
-                    onChange={(e) => setAdminPassword(e.target.value)} 
-                    placeholder="Masukkan password admin"
-                    style={{ width: "100%", padding: 12, border: "1px solid #e5e7eb", borderRadius: 6, fontSize: 14, outline: "none", boxSizing: "border-box", marginBottom: 16 }}
-                  />
-                  <button 
-                    onClick={handleAdminLogin}
-                    style={{ width: "100%", padding: 14, backgroundColor: "#003366", color: "white", border: "none", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer" }}
-                  >
-                    🚀 Login
-                  </button>
+                  <input type="password" value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} placeholder="Masukkan password admin" style={{ width: "100%", padding: 12, border: "1px solid #e5e7eb", borderRadius: 6, fontSize: 14, outline: "none", boxSizing: "border-box", marginBottom: 16 }} />
+                  <button onClick={handleAdminLogin} style={{ width: "100%", padding: 14, backgroundColor: "#003366", color: "white", border: "none", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>🚀 Login</button>
                 </div>
               ) : (
                 <div>
@@ -770,11 +760,7 @@ export default function HomePage() {
                   
                   <div style={{ marginBottom: 16 }}>
                     <label style={{ display: "block", marginBottom: 8, fontWeight: 500, color: "#003366", fontSize: 14 }}>📁 Kategori</label>
-                    <select 
-                      value={uploadKategori} 
-                      onChange={(e) => setUploadKategori(e.target.value)}
-                      style={{ width: "100%", padding: 12, border: "1px solid #e5e7eb", borderRadius: 6, fontSize: 14, outline: "none", backgroundColor: "white", boxSizing: "border-box" }}
-                    >
+                    <select value={uploadKategori} onChange={(e) => setUploadKategori(e.target.value)} style={{ width: "100%", padding: 12, border: "1px solid #e5e7eb", borderRadius: 6, fontSize: 14, outline: "none", backgroundColor: "white", boxSizing: "border-box" }}>
                       <option value="resmi">💰 Testimoni Gajian</option>
                       <option value="ilegal">✅ Bukti Legal/Resmi</option>
                     </select>
@@ -794,20 +780,10 @@ export default function HomePage() {
 
                   <div style={{ marginBottom: 16 }}>
                     <label style={{ display: "block", marginBottom: 8, fontWeight: 500, color: "#003366", fontSize: 14 }}>📝 Keterangan (Opsional)</label>
-                    <input 
-                      type="text" 
-                      value={uploadKeterangan} 
-                      onChange={(e) => setUploadKeterangan(e.target.value)} 
-                      placeholder="Contoh: Transfer gaji pekerja tanggal..."
-                      style={{ width: "100%", padding: 12, border: "1px solid #e5e7eb", borderRadius: 6, fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                    />
+                    <input type="text" value={uploadKeterangan} onChange={(e) => setUploadKeterangan(e.target.value)} placeholder="Contoh: Transfer gaji pekerja tanggal..." style={{ width: "100%", padding: 12, border: "1px solid #e5e7eb", borderRadius: 6, fontSize: 14, outline: "none", boxSizing: "border-box" }} />
                   </div>
 
-                  <button 
-                    onClick={handleUploadTestimoni}
-                    disabled={isUploading || !uploadImage}
-                    style={{ width: "100%", padding: 14, backgroundColor: isUploading || !uploadImage ? "#9ca3af" : "#003366", color: "white", border: "none", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: isUploading || !uploadImage ? "not-allowed" : "pointer" }}
-                  >
+                  <button onClick={handleUploadTestimoni} disabled={isUploading || !uploadImage} style={{ width: "100%", padding: 14, backgroundColor: isUploading || !uploadImage ? "#9ca3af" : "#003366", color: "white", border: "none", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: isUploading || !uploadImage ? "not-allowed" : "pointer" }}>
                     {isUploading ? "⏳ Mengupload..." : "📤 Upload Testimoni"}
                   </button>
                 </div>
@@ -827,7 +803,6 @@ export default function HomePage() {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-            {/* Contact Info */}
             <div style={{ backgroundColor: "white", borderRadius: 12, padding: 20, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
               <h3 style={{ color: "#003366", fontWeight: "bold", marginBottom: 16, fontSize: 16 }}>📞 Informasi Kontak</h3>
               
@@ -863,7 +838,6 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Registration Form */}
             <div style={{ backgroundColor: "white", borderRadius: 12, padding: 20, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
               <h3 style={{ color: "#003366", fontWeight: "bold", marginBottom: 16, fontSize: 16 }}>📋 Form Pendaftaran</h3>
               
