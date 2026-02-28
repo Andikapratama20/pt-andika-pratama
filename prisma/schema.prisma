@@ -8,13 +8,30 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model Pendaftaran {
+  id              String    @id @default(cuid())
+  namaLengkap     String
+  nomorHP         String
+  durasiKontrak   String
+  fotoUrl         String?
+  nomorRekening   String
+  namaBank        String
+  jenisLayanan    String
+  status          String    @default("pending")
+  nomorKontrak    String?
+  tanggalDaftar   DateTime  @default(now())
+  tanggalKontrak  DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
 model Testimoni {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   kategori    String
   imageUrl    String
   keterangan  String?
-  urutan      Int      @default(0)
-  aktif       Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  urutan      Int       @default(0)
+  aktif       Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
