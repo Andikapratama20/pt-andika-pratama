@@ -1,53 +1,16 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
-}
-
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Pendaftaran {
-  id              String   @id @default(cuid())
-  namaLengkap     String
-  nomorHP         String
-  durasiKontrak   String
-  fotoUrl         String?
-  nomorRekening   String
-  namaBank        String
-  jenisLayanan    String   // "Setengah" atau "Full"
-  status          String   @default("pending") // pending, approved, rejected
-  nomorKontrak    String?
-  tanggalDaftar   DateTime @default(now())
-  tanggalKontrak  DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Testimoni {
   id          String   @id @default(cuid())
-  kategori    String   // "resmi" atau "ilegal"
+  kategori    String
   imageUrl    String
   keterangan  String?
   urutan      Int      @default(0)
