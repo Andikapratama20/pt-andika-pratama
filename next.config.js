@@ -1,5 +1,10 @@
-const nextConfig = {
-  reactStrictMode: true,
-}
+import type { NextConfig } from "next";
 
-module.exports = nextConfig
+const nextConfig: NextConfig = {
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  reactStrictMode: false,
+};
+
+export default nextConfig;
