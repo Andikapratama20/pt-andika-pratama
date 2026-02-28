@@ -1,14 +1,12 @@
 {
-  "name": "nextjs_tailwind_shadcn_ts",
-  "version": "0.2.0",
+  "name": "pt-andika-pratama",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000",
-    "build": "next build",
+    "dev": "next dev",
+    "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint .",
-    "db:push": "prisma db push",
-    "db:generate": "prisma generate"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@prisma/client": "^6.11.1",
