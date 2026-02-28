@@ -1,24 +1,28 @@
 {
-  "name": "pt-andika-pratama",
-  "version": "1.0.0",
+  "name": "nextjs_tailwind_shadcn_ts",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "prisma generate && next build",
+    "dev": "next dev -p 3000",
+    "build": "next build",
     "start": "next start",
-    "postinstall": "prisma generate"
+    "lint": "eslint .",
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate"
   },
   "dependencies": {
-    "@prisma/client": "^5.15.0",
-    "next": "14.2.5",
-    "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "@prisma/client": "^6.11.1",
+    "next": "^16.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@types/node": "20",
-    "@types/react": "18",
-    "@types/react-dom": "18",
-    "prisma": "^5.15.0",
-    "typescript": "5"
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "^16.1.6",
+    "prisma": "^6.11.1",
+    "typescript": "^5"
   }
 }
